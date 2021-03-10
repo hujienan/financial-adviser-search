@@ -1,0 +1,39 @@
+version: '3.7'
+
+services: 
+  server:
+    container_name: search-server
+    build: .
+    ports: 
+      - "8000:3000"
+    environment: 
+      - PORT=3000
+      - ES_HOST=es
+
+  frontend:
+    container_name: search-frontend
+    image: nginx
+    volumes: 
+      - ./frontend/build:/usr/share/nginx/html
+    ports: 
+      - "8080:80"
+  
+  es:
+    image: elasticsearch:7.11.1
+    container_name: es
+    environment: 
+      - discovery.type=single-node
+    ports: 
+      - "9200:9200"
+    volumes: 
+      - esdata:/usr/share/elasticsearch/data
+  
+  kibana:
+    image: kibana:7.11.1
+    container_name: kibana
+    ports: 
+      - "5601:5601"
+    environment: 
+      ELASTICSEARCH_HOSTS: '["http://es:9200"]'
+volumes: 
+  esdata:
