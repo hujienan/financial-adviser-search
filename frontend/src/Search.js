@@ -1,25 +1,26 @@
 import { useEffect, useState } from "react";
 import Result from './Result';
-
+import { debounce } from 'lodash';
 function Search() {
   const [query, setQuery] = useState("");
   const [result, setResult] = useState([]);
   const hostUrl = "http://localhost:8000/search";
-  function handleSearch(e) {
+  
+  const handleSearch = debounce((e) => {
     const value = e.target.value.trim();
     setQuery(value)
     if (value === "") {
       setResult([]);
     }
-  }
+  }, 100)
 
   useEffect(() => {
-    if (query !== "") {
-      fetch(`${hostUrl}?q=${query}`)
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-        const hits = data.body.hits.hits;
+    async function search() {
+      let url = `${hostUrl}?q=${query}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log(data);
+      const hits = data.body.hits.hits;
         const reducer = (acc, cur) => {
           let target = cur.inner_hits.status_sorted.hits.hits[0]._source;
           acc.push({
@@ -32,8 +33,27 @@ function Search() {
         let records = hits.reduce(reducer, []);
         console.log(records);
         setResult(records)
-
-      }).catch(e => console.log(e));
+    }
+    if (query !== "") {
+      search();
+      // fetch(`${hostUrl}?q=${query}`)
+      // .then(response => response.json())
+      // .then(data => {
+      //   console.log(data);
+      //   const hits = data.body.hits.hits;
+      //   const reducer = (acc, cur) => {
+      //     let target = cur.inner_hits.status_sorted.hits.hits[0]._source;
+      //     acc.push({
+      //       "name": target.name,
+      //       "number": target.number,
+      //       "status": target.status 
+      //     });
+      //     return acc;
+      //   };
+      //   let records = hits.reduce(reducer, []);
+      //   console.log(records);
+      //   setResult(records)
+      // }).catch(e => console.log(e));
     }
   }, [query]);
 
