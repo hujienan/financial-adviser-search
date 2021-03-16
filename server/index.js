@@ -37,6 +37,24 @@ router.get('/search', async (ctx, next) => {
         }
     })
 })
+router.get('/search-number', async (ctx, next) => {
+    const {
+        number
+    } = ctx.request.query
+    console.log(`Searching number for ${number}`)
+    ctx.body = await client.search({
+        index: 'adviser',
+        size: 20,
+        body: {
+            query: {
+                match: {
+                    number
+                }
+            }
+        }
+    })
+})
+
 
 app.use(async (ctx, next) => {
     const start = Date.now()

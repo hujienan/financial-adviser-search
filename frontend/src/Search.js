@@ -8,7 +8,7 @@ function Search() {
   
   const handleSearch = debounce((e) => {
     const value = e.target.value.trim();
-    setQuery(value)
+    setQuery(value);
     if (value === "") {
       setResult([]);
     }
@@ -19,7 +19,7 @@ function Search() {
       let url = `${hostUrl}?q=${query}`;
       const response = await fetch(url);
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
       const hits = data.body.hits.hits;
         const reducer = (acc, cur) => {
           let target = cur.inner_hits.status_sorted.hits.hits[0]._source;
@@ -31,11 +31,13 @@ function Search() {
           return acc;
         };
         let records = hits.reduce(reducer, []);
-        console.log(records);
+        // console.log(records);
         setResult(records)
     }
     if (query !== "") {
+      //use await
       search();
+      //use promise
       // fetch(`${hostUrl}?q=${query}`)
       // .then(response => response.json())
       // .then(data => {
