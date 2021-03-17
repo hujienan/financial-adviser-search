@@ -1,6 +1,7 @@
 import { debounce } from "lodash";
 import { useEffect, useState } from "react";
 import Modal from "./Modal";
+import AdviserDetails from "./AdviserDetails";
 
 function Result({ records }) {
   const hostUrl = "http://localhost:8000/search-number";
@@ -50,7 +51,9 @@ function Result({ records }) {
           {tableItems}
         </tbody>
       </table>
-      <Modal modalIsOpen={modalIsOpen} closeModal={closeModal} hits={hits}/>
+      <Modal modalIsOpen={modalIsOpen} closeModal={closeModal}>
+        { hits && <AdviserDetails hits={hits} />}
+      </Modal>
     </div>
   );
 }
