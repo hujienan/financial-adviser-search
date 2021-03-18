@@ -44,7 +44,8 @@ async function indexData(results) {
             licence_abn: result.LICENCE_ABN,
             licence_controlled_by: result.LICENCE_CONTROLLED_BY,
             start_date: result.ADV_START_DT,
-            end_date: result.ADV_END_DT
+            end_date: result.ADV_END_DT,
+            memberships: result.MEMBERSHIPS
         })
 
         if (i > 0 && i % 500 === 0) {

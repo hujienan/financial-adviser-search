@@ -4,9 +4,11 @@ import './index.css';
 // import App from './App';
 import Search from './Search';
 import reportWebVitals from './reportWebVitals';
+import ReactToolTip from 'react-tooltip';
 
 ReactDOM.render(
   <React.StrictMode>
+    <ReactToolTip />
     <Search />
   </React.StrictMode>,
   document.getElementById('root')
