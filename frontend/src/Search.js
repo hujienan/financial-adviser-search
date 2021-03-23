@@ -62,8 +62,8 @@ function Search() {
   return ( 
     <div>
       <h1 className="text-center uppercase m-8 text-2xl font-light">Financial adviser search</h1>
-      <div className="text-center m-10 p-10 bg-gray-800">
-        <input className="w-1/2 text-center bg-transparent text-xl border-b border-white text-white p-4 font-light" placeholder="Search here..." onChange={handleSearch} />
+      <div className="text-center m-1 md:m-10 p-2 md:p-10 bg-gray-800">
+        <input className="w-4/5 md:w-1/2 text-center bg-transparent text-xl border-b border-white text-white p-4 font-light" placeholder="Search here..." onChange={handleSearch} />
         { result.length > 0 && <Result records={result} /> }
       </div>
     </div>
