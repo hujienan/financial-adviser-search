@@ -19,7 +19,6 @@ function Search() {
       let url = `${hostUrl}?q=${query}`;
       const response = await fetch(url);
       const data = await response.json();
-      // console.log(data);
       const hits = data.body.hits.hits;
         const reducer = (acc, cur) => {
           let target = cur.inner_hits.status_sorted.hits.hits[0]._source;
@@ -31,7 +30,6 @@ function Search() {
           return acc;
         };
         let records = hits.reduce(reducer, []);
-        // console.log(records);
         setResult(records)
     }
     if (query !== "") {

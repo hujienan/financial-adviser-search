@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import ReactToolTip from 'react-tooltip';
-import { Line, Bar } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import moment from 'moment';
 function AdviserDetails({ hits }) {
   const firstHit = hits[0]._source;
@@ -22,20 +22,10 @@ function AdviserDetails({ hits }) {
       return -1;
     }
   })
-  const current = datasets.some(dataset => dataset.status === 'Current');
-  
-  // const items = hits.map((hit, index) => {
-  //   const source = hit._source;
-  //   return (
-  //     <li key={index}>
-  //       {source.name} {source.start_date} {source.end_date}
-  //     </li>
-  //   );
-  // })
-  let chartData = [];
-
+  let chartData = [], currentDatasets = [], ceasedDatasets = [];
   datasets.forEach((dataset, index) => {
     if (dataset.status !== 'Current') {
+      ceasedDatasets.push(dataset);
       chartData.push({
         label: `dataset-${index}`,
         data: [{
@@ -48,6 +38,7 @@ function AdviserDetails({ hits }) {
         borderColor: "gray"
       });
     } else {
+      currentDatasets.push(dataset);
       chartData.push({
         label: `dataset-${index}`,
         data: [{
@@ -60,13 +51,62 @@ function AdviserDetails({ hits }) {
         borderColor: "blue",
       });
     }
-  })
-
-
-
-  useEffect(() => {
-    ReactToolTip.rebuild();
   });
+  let currentAppointment, ceasedAppointment, current = false;
+  if (currentDatasets.length <= 0) {
+    currentAppointment = <p className="text-xl">Not currently appointed as an adviser.</p>;
+  } else {
+    current = true;
+    currentAppointment = currentDatasets.map(dataset => {
+      return <div className="border mb-2">
+        <p className="bg-blue-600 text-white pl-2 text-xl py-2">{dataset.start_date} - ongoing</p>
+        <div className="flex justify-between p-2">
+          <div className="w-1/2">
+            <p className="text-blue-600">Appointment type <span className="bg-blue-700 text-white inline-block w-6 h-6 text-center rounded-full font-light cursor-pointer" data-effect="solid" data-multiline="true" data-tip="A financial adviser is authorised to <br> advise retail clients. A provisional <br> adviser must be supervised by a <br> financial adviser. A time-share <br> adviser may advise about time-<br>share investments only.">?</span></p>
+            <p>Financial Adviser</p>
+          </div>
+          <div className="w-1/2">
+            <p>Principal place of business </p>
+            <p>Lvl 17
+120 COLLINS St
+MELBOURNE VIC 3000</p>
+          </div>
+        </div>
+        <p>{dataset.licence_name}(licence holder)</p>
+        <p className="table-row"><span className="table-cell font-bold pr-4">Number:</span><a title="Licensee details on ASIC Connect" href={`https://connectonline.asic.gov.au/RegistrySearch/faces/landing/panelSearch.jspx?searchNumber=${dataset.licence_number}&searchType=PRAFSLicsee&searchName=`} target="_blank" rel="noopener noreferrer" className="underline">{dataset.licence_number}</a></p>
+        <p className="table-row"><span className="table-cell font-bold pr-4">ABN:</span><a title="ABN details on Australian Business Register" href={`http://abr.business.gov.au/SearchByAbn.aspx?abn=${dataset.licence_abn}`} target="_blank" rel="noopener noreferrer" className="underline">{dataset.licence_abn}</a></p>
+        <p className="table-row"><span className="table-cell font-bold pr-4">Controlled by: <span className="bg-blue-700 text-white inline-block w-6 h-6 text-center rounded-full font-light cursor-pointer" data-effect="solid" data-multiline="true" data-tip="The company(ies) or people who <br> control the licensee's business. <br> They can sometimes be a <br> majority shareholder or able to <br> control votes at meetings or <br> board composition.">?</span></span>{dataset.licence_controlled_by ? dataset.licence_controlled_by : '-'}</p>
+      </div>;
+    })
+  }
+
+  if (ceasedDatasets.length <= 0) {
+    ceasedAppointment = <p className="text-xl">No history recorded.</p>;
+  } else {
+    ceasedAppointment = ceasedDatasets.map(dataset => {
+      return <div>
+        <p>{dataset.start_date} - {dataset.end_date}</p>
+        <div className="flex justify-between">
+          <div className="w-48">
+            <p>Appointment type</p>
+            <p>Financial Adviser</p>
+          </div>
+          <div className="w-48">
+            <p>Principal place of business</p>
+            <p>Lvl 17
+120 COLLINS St
+MELBOURNE VIC 3000</p>
+          </div>
+        </div>
+        <p>{dataset.licence_name}(licence holder)</p>
+        <p className="table-row"><span className="table-cell font-bold pr-4">Number:</span><a title="Licensee details on ASIC Connect" href={`https://connectonline.asic.gov.au/RegistrySearch/faces/landing/panelSearch.jspx?searchNumber=${dataset.licence_number}&searchType=PRAFSLicsee&searchName=`} target="_blank" rel="noopener noreferrer" className="underline">{dataset.licence_number}</a></p>
+        <p className="table-row"><span className="table-cell font-bold pr-4">ABN:</span><a title="ABN details on Australian Business Register" href={`http://abr.business.gov.au/SearchByAbn.aspx?abn=${dataset.licence_abn}`} target="_blank" rel="noopener noreferrer" className="underline">{dataset.licence_abn}</a></p>
+        <p className="table-row"><span className="table-cell font-bold pr-4">Controlled by: <span className="bg-blue-700 text-white inline-block w-6 h-6 text-center rounded-full font-light cursor-pointer" data-effect="solid" data-multiline="true" data-tip="The company(ies) or people who <br> control the licensee's business. <br> They can sometimes be a <br> majority shareholder or able to <br> control votes at meetings or <br> board composition.">?</span></span>{dataset.licence_controlled_by ? dataset.licence_controlled_by : '-'}</p>
+      </div>;
+    })
+  }
+
+
   const data = {
     datasets: chartData
   };
@@ -112,7 +152,6 @@ function AdviserDetails({ hits }) {
       }],
       yAxes: [{
         ticks: {
-            // Include a dollar sign in the ticks
             callback: function(value, index, values) {
                 if (value === 1) {
                   return "Previous";
@@ -130,12 +169,15 @@ function AdviserDetails({ hits }) {
     }
   };
 
+  useEffect(() => {
+    ReactToolTip.rebuild();
+  });
   return (
     <div>
       <p className="py-4 text-3xl bg-blue-600 text-white pl-4">Details: {name}</p>
-      <div className="px-4 py-4">
+      <div className="p-4">
         <p className="text-3xl font-light">Summary</p>
-        <div className="p-2 border flex flex-col md:flex-row-reverse">
+        <div className="p-2 border flex flex-col md:flex-row-reverse mb-4">
           <div>
             <p className="font-bold">Status:</p>
             <p className={`text-3xl md:text-5xl pl-4 md:pl-0 ${current ? 'text-blue-600' : 'text-gray-600'}`}>{current ? 'Current' : 'Ceased'}</p>
@@ -148,8 +190,21 @@ function AdviserDetails({ hits }) {
           </div>
         </div>
         <p className="text-3xl font-light">Appointment timeline</p>
-        <div className="p-2 border">
+        <p className="text-sm italic font-extralight">Summary of financial adviser's appointments. See below for further details.</p>
+        <div className="p-2 border mb-4">
           <Line data={data} options={options} height={80} />
+        </div>
+        <p className="text-3xl font-light">Current appointment(s)</p>
+        <p className="text-sm italic font-extralight">Financial adviser's current appointment details, including product areas the financial adviser can provide advice on.</p>
+        <p className="text-sm italic font-extralight">For business name details, click on the Australian Business Register (ABN).</p>
+        <div className="mb-4">
+          {currentAppointment}
+        </div>
+        <p className="text-3xl font-light">Previous appointment(s)</p>
+        <p className="text-sm italic font-extralight">This section provides the financial adviser's appointment history back to March 2010.</p>
+        <p className="text-sm italic font-extralight">For business name details, click on the ABN to go to the Australian business register and view any related business names.</p>
+        <div className="p-2 border mb-4">
+          {ceasedAppointment}
         </div>
       </div>
     </div>

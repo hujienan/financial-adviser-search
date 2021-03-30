@@ -36,6 +36,7 @@ async function indexData(results) {
         bulkOps.push({
             name: result.ADV_NAME,
             number: result.ADV_NUMBER,
+            appointment_type: result.ADV_SUB_TYPE,
             abn: result.ADV_ABN,
             status: result.ADV_ROLE_STATUS,
             first_provided_advice: result.ADV_FIRST_PROVIDED_ADVICE,
@@ -45,7 +46,13 @@ async function indexData(results) {
             licence_controlled_by: result.LICENCE_CONTROLLED_BY,
             start_date: result.ADV_START_DT,
             end_date: result.ADV_END_DT,
-            memberships: result.MEMBERSHIPS
+            cpd_failure_year: result.ADV_CPD_FAILURE_YEAR,
+            rep_appointed_by: result.REP_APPOINTED_BY,
+            rep_appointed_number: result.REP_APPOINTED_NUM,
+            rep_appointed_abn: result.REP_APPOINTED_ABN,
+            qualifications_and_training: result.QUALIFICATIONS_AND_TRAINING,
+            memberships: result.MEMBERSHIPS,
+            further_restrictions: result.FURTHER_RESTRICTIONS
         })
 
         if (i > 0 && i % 500 === 0) {
